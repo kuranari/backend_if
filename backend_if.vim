@@ -15,6 +15,7 @@ function! s:strip(input_string)
     return substitute(a:input_string, '^\s*\(.\{-}\)\s*$', '\1', '')
 endfunction
 
+" 現在行から上2行以内に1行化可能な文があるか
 function! s:serch_begin_state()
   let line_num = line('.')
   let lines = reverse(getline(line_num - 2, line_num))
@@ -26,7 +27,6 @@ function! s:serch_begin_state()
     endif
     let i += 1
   endfor
-
   return 0
 endfunction
 
@@ -73,6 +73,21 @@ function! s:ToOnelineState()
   endif
 endfunction
 
+function! s:ToggleState()
+  let can_one_line = s:getBeginLineOfState()
+  let can_multi_line = getline('.') =~ s:to_multi_begin_exp
+  if can_one_line && can_multi_line
+    echo "何かがおかしい…"
+  elseif can_one_line
+    call s:ToOnelineState()
+  elseif can_multi_line
+    call s:ToMultilineState()
+  else
+    echo "Cannot toggle state"
+  endif
+endfunction
+
 command! -nargs=0 ToOnelineState call <SID>ToOnelineState()
 command! -nargs=0 ToMultilineState call <SID>ToMultilineState()
+command! -nargs=0 ToggleState call <SID>ToggleState()
 
