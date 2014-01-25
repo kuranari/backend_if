@@ -12,7 +12,7 @@ function! s:getBeginLineOfState()
 
   for line in lines
     " TODO: if array.nil? thenのようなthenつき表現にも対応する
-    if line =~ '\s*\(if\|unless\|while\|until\).*'
+    if line =~ '\s*\<\(if\|unless\|while\|until\)\>.*'
       let begin_num = line_num - i
       break
     endif
@@ -26,11 +26,30 @@ function! s:getBeginLineOfState()
   endif
 endfunction
 
+function! ToMultilineState()
+  let line = getline('.')
+  if line =~ '\s*\(.*\)\<\(if\|unless\|while\|untill\)\>\(.*\)'
+    " let list = matchlist(line, '\s*\(.*\)\(if\|unless\|while\|untill\)\(.*\)')
+    " echo list[1]
+    " echo list[2]
+    " echo list[3]
+    let list = split(line, '\ze\<\(if\|unless\|while\|untill\)\>')
+    echo list
+    call append('.', "end")
+    call append('.', list[0])
+    call append('.', list[1])
+    execute ":.delete"
+    normal! 3==
+  else
+    echo "Cannot multi line state."
+  end
+endfunction
+
 function! ToOnelineState()
   let begin_line = s:getBeginLineOfState()
   if begin_line
     execute ":" . begin_line
-    normal! ddpkJjddk==
+    normal! ddpkJ==jddk
   else
     echo "Cannot one line state."
   endif
