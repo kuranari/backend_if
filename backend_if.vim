@@ -5,29 +5,35 @@
 " 後置表現できない場合：0
 " 後置表現できる場合: 開始行番号
 
-let s:words = '\<\(if\|unless\|while\|until\)\>'
+let s:words = '\<\%(if\|unless\|while\|until\)\>'
+let s:to_one_begin_exp = '^\s*\('. s:words .'.\{-}\)\%(then\)\{-0,1}\s*$'
+let s:to_one_end_exp = '^\s*end\s*$'
+let s:to_multi_begin_exp = '^\s*\(\S.*\)'. s:words .'\s*\(.*\)$'
 
+" 前後の空白を削除
 function! s:strip(input_string)
     return substitute(a:input_string, '^\s*\(.\{-}\)\s*$', '\1', '')
 endfunction
 
-function! s:getBeginLineOfState()
+function! s:serch_begin_state()
   let line_num = line('.')
   let lines = reverse(getline(line_num - 2, line_num))
-  let i = 0
-  let begin_num = 0
 
+  let i = 0
   for line in lines
-    " TODO: if array.nil? thenのようなthenつき表現にも対応する
-    if line =~ '\s*'. s:words .'.*'
-      let begin_num = line_num - i
-      break
+    if line =~ s:to_one_begin_exp
+      return line_num - i
     endif
     let i += 1
   endfor
 
-  if !begin_num || getline(begin_num + 2) =~ '\s*end\s*'
-    return begin_num
+  return 0
+endfunction
+
+function! s:getBeginLineOfState()
+  let begin_line = s:serch_begin_state()
+  if begin_line && getline(begin_line + 2) =~ s:to_one_end_exp
+    return begin_line
   else
     return 0
   endif
@@ -35,15 +41,13 @@ endfunction
 
 function! s:ToMultilineState()
   let line = getline('.')
-  if line =~ '\s*\(.*\)'. s:words .'\s*\(.*\)'
-    " let list = matchlist(line, '\s*\(.*\)'. s:words .'\s*\(.*\)')
-    " echo list[1]
-    " echo list[2]
-    " echo list[3]
+  if line =~ s:to_multi_begin_exp
     let list = split(line, '\ze'. s:words)
     call append(line('.')-1, s:strip(list[1]))
     call append(line('.')-1, s:strip(list[0]))
     call setline('.', "end")
+
+    " インデント
     normal! 2k3==
   else
     echo "Cannot multi line state."
@@ -54,7 +58,16 @@ function! s:ToOnelineState()
   let begin_line = s:getBeginLineOfState()
   if begin_line
     execute ":" . begin_line
-    normal! ddpkJ==jddk
+
+    let condition = substitute(getline('.'), s:to_one_begin_exp, '\1', "")
+    let body = getline(line('.') + 1)
+
+    let end_line = begin_line + 2
+    execute ":". begin_line .",". end_line ."delete"
+    call append(line('.')-1, s:strip(body) ." ". s:strip(condition))
+
+    " インデント
+    normal! k==
   else
     echo "Cannot one line state."
   endif
