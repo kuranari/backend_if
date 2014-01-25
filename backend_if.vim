@@ -26,7 +26,7 @@ function! s:getBeginLineOfState()
   endif
 endfunction
 
-function! ToMultilineState()
+function! s:ToMultilineState()
   let line = getline('.')
   if line =~ '\s*\(.*\)\<\(if\|unless\|while\|untill\)\>\(.*\)'
     " let list = matchlist(line, '\s*\(.*\)\(if\|unless\|while\|untill\)\(.*\)')
@@ -45,7 +45,7 @@ function! ToMultilineState()
   end
 endfunction
 
-function! ToOnelineState()
+function! s:ToOnelineState()
   let begin_line = s:getBeginLineOfState()
   if begin_line
     execute ":" . begin_line
@@ -54,3 +54,7 @@ function! ToOnelineState()
     echo "Cannot one line state."
   endif
 endfunction
+
+command! -nargs=0 ToOnelineState call <SID>ToOnelineState()
+command! -nargs=0 ToMultilineState call <SID>ToMultilineState()
+
