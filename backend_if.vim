@@ -4,6 +4,13 @@
 " [返り値]
 " 後置表現できない場合：0
 " 後置表現できる場合: 開始行番号
+
+let s:words = '\<\(if\|unless\|while\|until\)\>'
+
+function! s:strip(input_string)
+    return substitute(a:input_string, '^\s*\(.\{-}\)\s*$', '\1', '')
+endfunction
+
 function! s:getBeginLineOfState()
   let line_num = line('.')
   let lines = reverse(getline(line_num - 2, line_num))
@@ -12,7 +19,7 @@ function! s:getBeginLineOfState()
 
   for line in lines
     " TODO: if array.nil? thenのようなthenつき表現にも対応する
-    if line =~ '\s*\<\(if\|unless\|while\|until\)\>.*'
+    if line =~ '\s*'. s:words .'.*'
       let begin_num = line_num - i
       break
     endif
@@ -28,18 +35,16 @@ endfunction
 
 function! s:ToMultilineState()
   let line = getline('.')
-  if line =~ '\s*\(.*\)\<\(if\|unless\|while\|untill\)\>\(.*\)'
-    " let list = matchlist(line, '\s*\(.*\)\(if\|unless\|while\|untill\)\(.*\)')
+  if line =~ '\s*\(.*\)'. s:words .'\s*\(.*\)'
+    " let list = matchlist(line, '\s*\(.*\)'. s:words .'\s*\(.*\)')
     " echo list[1]
     " echo list[2]
     " echo list[3]
-    let list = split(line, '\ze\<\(if\|unless\|while\|untill\)\>')
-    echo list
-    call append('.', "end")
-    call append('.', list[0])
-    call append('.', list[1])
-    execute ":.delete"
-    normal! 3==
+    let list = split(line, '\ze'. s:words)
+    call append(line('.')-1, s:strip(list[1]))
+    call append(line('.')-1, s:strip(list[0]))
+    call setline('.', "end")
+    normal! 2k3==
   else
     echo "Cannot multi line state."
   end
