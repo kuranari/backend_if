@@ -1,9 +1,9 @@
 " coding: utf-8
 
 let s:words = '\<\%(if\|unless\|while\|until\)\>'
-let s:to_one_begin_exp = '^\s*\('. s:words .'.\{-}\)\%(then\)\{-0,1}\s*$'
-let s:to_one_end_exp = '^\s*end\s*$'
-let s:to_multi_begin_exp = '^\s*\(\S.*\)'. s:words .'\s*\(.*\)$'
+let s:oneline_begin_exp = '^\s*\('. s:words .'.\{-}\)\%(then\)\{-0,1}\s*$'
+let s:oneline_end_exp = '^\s*end\s*$'
+let s:multiline_begin_exp = '^\s*\(\S.*\)'. s:words .'\s*\(.*\)$'
 
 " 前後の空白を削除
 function! s:strip(input_string)
@@ -17,7 +17,7 @@ function! s:serch_begin_state()
 
   let i = 0
   for line in lines
-    if line =~ s:to_one_begin_exp
+    if line =~ s:oneline_begin_exp
       return line_num - i
     endif
     let i += 1
@@ -27,7 +27,7 @@ endfunction
 
 function! s:can_change_to_oneline()
   let begin_line = s:serch_begin_state()
-  if begin_line && getline(begin_line + 2) =~ s:to_one_end_exp
+  if begin_line && getline(begin_line + 2) =~ s:oneline_end_exp
     return begin_line
   else
     return 0
@@ -35,7 +35,7 @@ function! s:can_change_to_oneline()
 endfunction
 
 function! s:can_change_to_multiline()
-  return getline('.') =~ s:to_multi_begin_exp
+  return getline('.') =~ s:multiline_begin_exp
 endfunction
 
 function! s:change_to_multiline()
@@ -49,19 +49,10 @@ function! s:change_to_multiline()
   normal! 2k3==
 endfunction
 
-function! s:ToMultilineState()
-  let can_change = s:can_change_to_multiline()
-  if can_change
-    call s:change_to_multiline()
-  else
-    echo "Cannot multi line state."
-  end
-endfunction
-
 function! s:change_to_oneline(begin_line)
   execute ":" . a:begin_line
 
-  let condition = substitute(getline('.'), s:to_one_begin_exp, '\1', "")
+  let condition = substitute(getline('.'), s:oneline_begin_exp, '\1', "")
   let body = getline(line('.') + 1)
 
   let end_line = a:begin_line + 2
@@ -72,7 +63,7 @@ function! s:change_to_oneline(begin_line)
   normal! k==
 endfunction
 
-function! s:ToOnelineState()
+function! s:ToOnelineStatement()
   let begin_line = s:can_change_to_oneline()
   if begin_line
     call s:change_to_oneline(begin_line)
@@ -81,7 +72,16 @@ function! s:ToOnelineState()
   endif
 endfunction
 
-function! s:ToggleState()
+function! s:ToMultilineStatement()
+  let can_change = s:can_change_to_multiline()
+  if can_change
+    call s:change_to_multiline()
+  else
+    echo "Cannot multi line state."
+  end
+endfunction
+
+function! s:ToggleStatement()
   let can_one_line = s:can_change_to_oneline()
   let can_multi_line = s:can_change_to_multiline()
   if can_one_line && can_multi_line
@@ -95,7 +95,7 @@ function! s:ToggleState()
   endif
 endfunction
 
-command! -nargs=0 ToOnelineState call <SID>ToOnelineState()
-command! -nargs=0 ToMultilineState call <SID>ToMultilineState()
-command! -nargs=0 ToggleState call <SID>ToggleState()
+command! -nargs=0 ToOnelineStatement call <SID>ToOnelineStatement()
+command! -nargs=0 ToMultilineStatement call <SID>ToMultilineStatement()
+command! -nargs=0 ToggleStatement call <SID>ToggleStatement()
 
