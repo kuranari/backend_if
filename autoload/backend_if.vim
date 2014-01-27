@@ -1,4 +1,6 @@
 " coding: utf-8
+let s:save_cpo = &cpo
+set cpo&vim
 
 let s:words = '\<\%(if\|unless\|while\|until\)\>'
 let s:oneline_begin_exp = '^\s*\('. s:words .'.\{-}\)\%(then\)\{-0,1}\s*$'
@@ -63,7 +65,7 @@ function! s:change_to_oneline(begin_line)
   normal! k==
 endfunction
 
-function! s:ToOnelineStatement()
+function! backend_if#ToOnelineStatement()
   let begin_line = s:can_change_to_oneline()
   if begin_line
     call s:change_to_oneline(begin_line)
@@ -72,7 +74,7 @@ function! s:ToOnelineStatement()
   endif
 endfunction
 
-function! s:ToMultilineStatement()
+function! backend_if#ToMultilineStatement()
   let can_change = s:can_change_to_multiline()
   if can_change
     call s:change_to_multiline()
@@ -81,7 +83,7 @@ function! s:ToMultilineStatement()
   end
 endfunction
 
-function! s:ToggleStatement()
+function! backend_if#ToggleStatement()
   let can_one_line = s:can_change_to_oneline()
   let can_multi_line = s:can_change_to_multiline()
   if can_one_line && can_multi_line
@@ -95,7 +97,5 @@ function! s:ToggleStatement()
   endif
 endfunction
 
-command! -nargs=0 ToOnelineStatement call <SID>ToOnelineStatement()
-command! -nargs=0 ToMultilineStatement call <SID>ToMultilineStatement()
-command! -nargs=0 ToggleStatement call <SID>ToggleStatement()
-
+let &cpo = s:save_cpo
+unlet s:save_cpo
