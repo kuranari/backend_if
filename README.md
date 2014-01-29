@@ -25,7 +25,7 @@ if true
   p "Hello world!"
 end
 ```
-Type `<Leader>t` or ':ToggleStatement' on the `if` statement, you shold see:
+Type `<Leader>t` or `:ToggleStatement` on the `if` statement, you shold see:
 
 ```
 p "Hello world!" if true
