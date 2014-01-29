@@ -3,6 +3,8 @@ backend_if
 
 ![](./anime.gif)
 
+このプラグインはRubyの後置記法を支援します
+使用可能なのは本文が1行の`if`,`unless`,`while`,`until`文です．
 # Installation
 
 To install using NeoBundle:
