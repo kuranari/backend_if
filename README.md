@@ -1,6 +1,8 @@
 backend_if
 ==========
 
+![](./anime.gif)
+
 # Installation
 
 To install using NeoBundle:
@@ -33,4 +35,3 @@ if true
 end
 ```
 
-![](./anime.gif)
