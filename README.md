@@ -14,7 +14,7 @@ Add this line to your .vimrc file
 ```
 NeoBundle "Qureana/backend_if"
 
-autocmd FileType ruby nnoremap gt :ToggleStatement<CR>
+autocmd FileType ruby nnoremap <Leader>t :ToggleStatement<CR>
 ```
 
 # Usage
@@ -25,7 +25,7 @@ if true
   p "Hello world!"
 end
 ```
-Type `gt` on the `if` statement, you shold see:
+Type `<Leader>t` or ':ToggleStatement' on the `if` statement, you shold see:
 
 ```
 p "Hello world!" if true
