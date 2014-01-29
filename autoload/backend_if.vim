@@ -15,7 +15,8 @@ endfunction
 " 現在行から上2行以内に1行化可能な文があるか
 function! s:serch_begin_state()
   let line_num = line('.')
-  let lines = reverse(getline(line_num - 2, line_num))
+  let head_line = max([line_num - 2, 1])
+  let lines = reverse(getline(head_line, line_num))
 
   let i = 0
   for line in lines
