@@ -25,12 +25,12 @@ if true
   p "Hello world!"
 end
 ```
-Type `<Leader>t` or `:ToggleStatement` on the `if` statement, you shold see:
+Type `<Leader>t` or `:ToggleStatement` on the `if` statement, you will see:
 
 ```
 p "Hello world!" if true
 ```
-And type `gt` again, you shold see:
+And type `gt` again, you will see:
 
 ```
 if true
