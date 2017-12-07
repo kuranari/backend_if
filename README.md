@@ -12,7 +12,7 @@ To install using NeoBundle:
 Add this line to your .vimrc file
 
 ```
-NeoBundle "Qureana/backend_if"
+NeoBundle "kuranari/backend_if"
 
 autocmd FileType ruby nnoremap <Leader>t :ToggleStatement<CR>
 ```
